@@ -1,0 +1,67 @@
+rules_version = '2';
+
+// ============================================================
+// QUINIELA NFL 2026 — Reglas de Firestore
+// ------------------------------------------------------------
+// Cárgalas en: Firebase Console > Firestore Database > Reglas
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function estaAutenticado() {
+      return request.auth != null;
+    }
+
+    function esAdmin() {
+      return estaAutenticado() &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol == "admin";
+    }
+
+    function esDueno(uid) {
+      return estaAutenticado() && request.auth.uid == uid;
+    }
+
+    // -------- solicitudes (inscripciones en revisión) --------
+    match /solicitudes/{id} {
+      // El formulario público crea la solicitud; nadie más puede escribir
+      // desde el cliente. Las Cloud Functions (Admin SDK) sí pueden,
+      // porque el Admin SDK no pasa por estas reglas.
+      allow create: if request.resource.data.estado == "pendiente";
+      allow read: if esAdmin();
+      allow update, delete: if esAdmin();
+    }
+
+    // -------- usuarios (participantes ya aprobados, uid = Firebase Auth uid) --------
+    match /usuarios/{uid} {
+      // Los documentos solo los crea la Cloud Function "aprobarInscripcion"
+      // (Admin SDK), nunca el cliente directamente.
+      allow create: if false;
+
+      // Un participante puede leer/editar su propio documento (ej. su apodo),
+      // pero nunca su rol o puntosTotales. Los admins pueden todo.
+      allow read: if esDueno(uid) || esAdmin();
+      allow update: if esAdmin() ||
+                    (esDueno(uid)
+                      && request.resource.data.rol == resource.data.rol
+                      && request.resource.data.puntosTotales == resource.data.puntosTotales);
+      allow delete: if esAdmin();
+    }
+
+    // -------- partidos (calendario + resultados) --------
+    match /partidos/{partidoId} {
+      allow read: if estaAutenticado();
+      allow write: if esAdmin();
+    }
+
+    // -------- pronosticos --------
+    match /pronosticos/{pronosticoId} {
+      allow read: if esAdmin() || (estaAutenticado() && resource.data.usuarioId == request.auth.uid);
+      allow create: if estaAutenticado() && request.resource.data.usuarioId == request.auth.uid;
+      // Los participantes solo pueden crear/editar los suyos; el cierre por horario
+      // se refuerza además desde Cloud Functions (Fase 4).
+      allow update: if esAdmin() || (estaAutenticado() && resource.data.usuarioId == request.auth.uid);
+      allow delete: if esAdmin();
+    }
+  }
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quiniela NFL 2026 — Mi Quiniela</title>
+<link rel="icon" href="../img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <img src="../img/logo.png" alt="Logo Quiniela NFL 2026" />
+    <div class="wordmark">Quiniela <span>NFL 2026</span></div>
+  </div>
+</header>
+
+<section class="block" style="border-top:none;padding-bottom:0;">
+  <div class="wrap" id="nav-mount"></div>
+</section>
+
+<section class="block" style="border-top:none;padding-top:0;padding-bottom:20px;">
+  <div class="wrap" style="display:flex;justify-content:flex-end;">
+    <span id="user-bar" style="font-size:13px;color:var(--cream-dim);"></span>
+  </div>
+</section>
+
+<section class="block" style="border-top:none;">
+  <div class="wrap">
+    <div class="block-head">
+      <span class="tag">Semana 1</span>
+      <h2>Mi Quiniela</h2>
+    </div>
+    <div class="callout">
+      Esta pantalla se construye en la <strong>Fase 4</strong>: mostrará cada partido
+      de la semana con los equipos Local/Visitante en columnas paralelas, el selector
+      L / E / V en medio, la fecha en letra pequeña, y se bloqueará automáticamente
+      5 minutos antes del primer partido según el calendario oficial de NFL.com.
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">Quiniela NFL 2026</div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth-guard.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+  requireAuth().then(({ datos }) => {
+    document.getElementById("nav-mount").appendChild(renderNav("quiniela"));
+
+    const userBar = document.getElementById("user-bar");
+    const nombreSpan = document.createElement("span");
+    nombreSpan.textContent = `${datos.apodo} · `;
+    const salirLink = document.createElement("a");
+    salirLink.href = "#";
+    salirLink.textContent = "Cerrar sesión";
+    salirLink.addEventListener("click", (e) => { e.preventDefault(); cerrarSesion(); });
+    userBar.appendChild(nombreSpan);
+    userBar.appendChild(salirLink);
+  });
+</script>
+</body>
+</html>

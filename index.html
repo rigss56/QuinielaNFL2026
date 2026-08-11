@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quiniela NFL 2026 — Registro e Instrucciones</title>
+<meta name="description" content="Inscríbete a la Quiniela NFL 2026: pronostica las 18 semanas de temporada regular, compite por premios semanales y la bolsa final." />
+<link rel="icon" href="img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <img src="img/logo.png" alt="Logo Quiniela NFL 2026" />
+    <div class="wordmark">Quiniela <span>NFL 2026</span></div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="goalpost-bg" aria-hidden="true">
+    <svg viewBox="0 0 200 220" fill="none">
+      <line x1="100" y1="220" x2="100" y2="88" stroke="#ffffff" stroke-width="6"/>
+      <line x1="38" y1="88" x2="162" y2="88" stroke="#ffffff" stroke-width="6"/>
+      <line x1="38" y1="88" x2="38" y2="14" stroke="#ffffff" stroke-width="6"/>
+      <line x1="162" y1="88" x2="162" y2="14" stroke="#ffffff" stroke-width="6"/>
+    </svg>
+  </div>
+
+  <div class="wrap hero-grid">
+    <div>
+      <p class="hero-eyebrow">Temporada regular · Semanas 1–18</p>
+      <h1>Quiniela<br /><em>NFL 2026</em></h1>
+      <p class="lead">
+        Regístrate una vez, espera la aprobación de un administrador y arranca a
+        pronosticar cada partido de la NFL con tu grupo. Premio semanal garantizado
+        y una bolsa final que se lleva el primer lugar de la tabla general.
+      </p>
+
+      <div class="scoreboard" aria-label="Marcador en vivo de la quiniela">
+        <div class="cell">
+          <div class="num" id="stat-inscritos">—</div>
+          <div class="label">Inscritos aprobados</div>
+        </div>
+        <div class="cell">
+          <div class="num" id="stat-bolsa">—</div>
+          <div class="label">Bolsa acumulada</div>
+        </div>
+        <div class="cell">
+          <div class="num" id="stat-premio-semanal">—</div>
+          <div class="label">Premio semanal</div>
+        </div>
+        <div class="cell">
+          <div class="num" id="stat-dias">—</div>
+          <div class="label">Para cerrar inscripción</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-helmet" aria-hidden="true">
+      <svg viewBox="0 0 320 300">
+        <defs>
+          <clipPath id="decal-clip">
+            <circle cx="238" cy="120" r="34" />
+          </clipPath>
+        </defs>
+        <!-- domo del casco -->
+        <path d="M50 150 C48 70 105 32 175 32 C240 32 278 62 281 112
+                 C283 148 270 172 250 190 L244 232 C241 249 226 260 203 260
+                 L138 260 C118 260 104 249 100 232
+                 C70 218 52 195 50 150 Z"
+              fill="#ffffff" stroke="#013369" stroke-width="5"/>
+        <!-- rejilla facial -->
+        <g fill="none" stroke="#013369" stroke-width="6" stroke-linecap="round">
+          <path d="M268 118 C226 100 178 104 150 130"/>
+          <path d="M266 148 C224 136 180 140 150 164"/>
+          <path d="M256 178 C220 170 184 172 158 192"/>
+          <path d="M268 118 C280 132 280 164 256 178"/>
+        </g>
+        <!-- barbiquejo -->
+        <path d="M150 230 C160 244 190 248 205 234" fill="none" stroke="#013369" stroke-width="5" stroke-linecap="round"/>
+        <!-- calcomanía con el logo -->
+        <circle cx="238" cy="120" r="35" fill="#ffffff" stroke="#d50a0a" stroke-width="4"/>
+        <image href="img/logo.png" x="203" y="85" width="70" height="70" clip-path="url(#decal-clip)" preserveAspectRatio="xMidYMid slice"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CÓMO FUNCIONA ================= -->
+<section class="block" id="como-funciona">
+  <div class="wrap">
+    <div class="yard-divider"><span class="num">40</span><span class="line"></span></div>
+    <div class="block-head">
+      <span class="tag">Playbook</span>
+      <h2>Cómo funciona</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">01</div>
+        <h3>Te registras</h3>
+        <p>Llenas el formulario con tu nombre, equipo favorito, correo y apodo. Es la única parte del sitio abierta al público.</p>
+      </div>
+      <div class="step">
+        <div class="n">02</div>
+        <h3>Un administrador aprueba</h3>
+        <p>Ricardo, Sergio o Alex revisan tu inscripción y la aprueban manualmente.</p>
+      </div>
+      <div class="step">
+        <div class="n">03</div>
+        <h3>Recibes tus credenciales</h3>
+        <p>Te llega un correo con usuario y contraseña temporal. Al entrar, defines tu contraseña definitiva.</p>
+      </div>
+      <div class="step">
+        <div class="n">04</div>
+        <h3>Ya tienes acceso completo</h3>
+        <p>Se desbloquean las pestañas de Quiniela, Tabla General y Premios para toda la temporada.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OPCIONES DE PRONÓSTICO ================= -->
+<section class="block" id="opciones">
+  <div class="wrap">
+    <div class="yard-divider"><span class="num">30</span><span class="line"></span></div>
+    <div class="block-head">
+      <span class="tag">Reglas</span>
+      <h2>Tres opciones, cada partido</h2>
+    </div>
+    <div class="tiles">
+      <div class="tile local">
+        <span class="letter">L</span>
+        <div class="name">Local</div>
+        <p>El equipo Local gana por 7 puntos de diferencia o más.</p>
+      </div>
+      <div class="tile empate">
+        <span class="letter">E</span>
+        <div class="name">Empate</div>
+        <p>La diferencia de resultado es menor a 7 puntos, gane quien gane.</p>
+      </div>
+      <div class="tile visitante">
+        <span class="letter">V</span>
+        <div class="name">Visitante</div>
+        <p>El equipo Visitante gana por 7 puntos de diferencia o más.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>1 punto por acierto.</strong> Tus pronósticos abren cada martes a las 6:00 a.m.
+      y se bloquean 5 minutos antes del primer partido de esa semana — el horario exacto
+      sigue el calendario oficial de NFL.com, que puede iniciar en miércoles, jueves o domingo
+      según la semana.
+    </div>
+  </div>
+</section>
+
+<!-- ================= REGLAMENTO COMPLETO ================= -->
+<section class="block" id="reglamento">
+  <div class="wrap">
+    <div class="yard-divider"><span class="num">20</span><span class="line"></span></div>
+    <div class="block-head">
+      <span class="tag">Reglamento</span>
+      <h2>Todo el detalle</h2>
+    </div>
+
+    <div class="rule-grid">
+      <div>
+        <h3>Inscripción</h3>
+        <ul>
+          <li>Costo: $1,750 MXN por participante.</li>
+          <li>Cupo máximo: 40 participantes.</li>
+          <li>Fecha límite de inscripción: 8 de septiembre de 2026, 20:00 hrs.</li>
+          <li>Cubre solo temporada regular (Semanas 1–18); no incluye pretemporada ni playoffs.</li>
+        </ul>
+
+        <h3 style="margin-top:24px">Si no llenas tu quiniela a tiempo</h3>
+        <ul>
+          <li>Todos tus marcadores se asignan automáticamente como V (Visitante).</li>
+          <li>Excepto el partido de tu equipo favorito, donde se te asigna la opción que lo haga ganar (L o V, según le toque jugar esa semana).</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3>Premios</h3>
+        <ul>
+          <li>Bolsa total = participantes aprobados × $1,750 MXN.</li>
+          <li>$1,000 MXN al 1er lugar de cada una de las 18 semanas.</li>
+          <li>El remanente se acumula y se entrega completo al 1er lugar general al cierre de la Semana 18 (el ganador se lleva todo el remanente).</li>
+        </ul>
+
+        <h3 style="margin-top:24px">Desempates semanales</h3>
+        <ul>
+          <li>Si hay empate en una semana, ese premio se retiene.</li>
+          <li>Se desempata comparando solo a los empatados en la semana siguiente, y así sucesivamente hasta que uno saque ventaja.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REGISTRO ================= -->
+<section class="block" id="registro">
+  <div class="wrap">
+    <div class="yard-divider goal"><span class="num">GOAL</span><span class="line"></span></div>
+    <div class="block-head">
+      <span class="tag">Paso 1</span>
+      <h2>Regístrate</h2>
+    </div>
+
+    <div style="max-width: 520px;">
+      <form class="ticket" id="form-registro" novalidate>
+        <div class="field">
+          <label for="nombre">Nombre completo</label>
+          <input type="text" id="nombre" name="nombre" required autocomplete="name" />
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="equipoFavorito">Equipo favorito</label>
+            <select id="equipoFavorito" name="equipoFavorito" required>
+              <option value="" disabled selected>Elige tu equipo</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="apodo">Apodo</label>
+            <input type="text" id="apodo" name="apodo" required placeholder="Como quieres aparecer en la tabla" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="correo">Correo electrónico</label>
+          <input type="email" id="correo" name="correo" required autocomplete="email" />
+        </div>
+
+        <button type="submit" class="btn-primary" id="submit-btn">Enviar inscripción</button>
+        <p class="form-note">Tu inscripción entra a revisión. Te llegará un correo cuando sea aprobada.</p>
+        <div id="form-status" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    Quiniela NFL 2026 · Dudas: contacta a un administrador (Mostro, Checo o NegroAguirre)
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/registro.js"></script>
+</body>
+</html>

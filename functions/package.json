@@ -1,0 +1,20 @@
+{
+  "name": "quiniela-nfl-2026-functions",
+  "description": "Cloud Functions: notificación de inscripción, aprobación/rechazo con generación de credenciales, y soporte de correos.",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.1.0",
+    "firebase-functions": "^5.0.0",
+    "@sendgrid/mail": "^8.1.3"
+  },
+  "private": true
+}
