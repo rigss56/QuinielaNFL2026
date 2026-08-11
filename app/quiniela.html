@@ -32,14 +32,28 @@
 <section class="block" style="border-top:none;">
   <div class="wrap">
     <div class="block-head">
-      <span class="tag">Semana 1</span>
+      <span class="tag" id="tag-semana">Semana 1</span>
       <h2>Mi Quiniela</h2>
     </div>
-    <div class="callout">
-      Esta pantalla se construye en la <strong>Fase 4</strong>: mostrará cada partido
-      de la semana con los equipos Local/Visitante en columnas paralelas, el selector
-      L / E / V en medio, la fecha en letra pequeña, y se bloqueará automáticamente
-      5 minutos antes del primer partido según el calendario oficial de NFL.com.
+
+    <div class="week-picker">
+      <label for="select-semana" style="font-size:13px;color:var(--cream-dim);">Semana:</label>
+      <select id="select-semana"></select>
+    </div>
+
+    <div id="lock-banner" style="display:none;" class="lock-banner"></div>
+    <div id="sin-partidos" class="callout" style="display:none;">
+      Todavía no hay partidos cargados para esta semana. Un administrador los agrega desde
+      Firebase (panel de Admin en construcción — Fase 6).
+    </div>
+
+    <div id="partidos-container"></div>
+
+    <div class="save-bar" id="save-bar" style="display:none;">
+      <div class="wrap" style="padding:0;display:flex;align-items:center;gap:16px;">
+        <button class="btn-primary" id="btn-guardar" style="width:auto;padding:13px 28px;">Guardar pronósticos</button>
+        <span id="save-status" style="font-size:13px;color:var(--cream-dim);"></span>
+      </div>
     </div>
   </div>
 </section>
@@ -54,20 +68,6 @@
 <script src="../js/firebase-config.js"></script>
 <script src="../js/auth-guard.js"></script>
 <script src="../js/nav.js"></script>
-<script>
-  requireAuth().then(({ datos }) => {
-    document.getElementById("nav-mount").appendChild(renderNav("quiniela"));
-
-    const userBar = document.getElementById("user-bar");
-    const nombreSpan = document.createElement("span");
-    nombreSpan.textContent = `${datos.apodo} · `;
-    const salirLink = document.createElement("a");
-    salirLink.href = "#";
-    salirLink.textContent = "Cerrar sesión";
-    salirLink.addEventListener("click", (e) => { e.preventDefault(); cerrarSesion(); });
-    userBar.appendChild(nombreSpan);
-    userBar.appendChild(salirLink);
-  });
-</script>
+<script src="../js/quiniela.js"></script>
 </body>
 </html>
