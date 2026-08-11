@@ -28,22 +28,6 @@ let partidosActuales = [];
 let seleccionesPendientes = {}; // partidoId -> "L" | "E" | "V"
 let usuarioActual = null;
 
-function poblarSelectorSemanas() {
-  const sel = document.getElementById("select-semana");
-  for (let s = 1; s <= 18; s++) {
-    const opt = document.createElement("option");
-    opt.value = s;
-    opt.textContent = `Semana ${s}`;
-    sel.appendChild(opt);
-  }
-  sel.value = String(semanaActual);
-  sel.addEventListener("change", () => {
-    semanaActual = parseInt(sel.value, 10);
-    document.getElementById("tag-semana").textContent = `Semana ${semanaActual}`;
-    cargarSemana();
-  });
-}
-
 function crearTarjetaPartido(partido, bloqueado, seleccionInicial) {
   const card = document.createElement("div");
   card.className = "matchup-card";
@@ -184,7 +168,8 @@ requireAuth().then(({ user, datos }) => {
   userBar.appendChild(nombreSpan);
   userBar.appendChild(salirLink);
 
-  poblarSelectorSemanas();
+  semanaActual = semanaActualPorFecha();
+  document.getElementById("tag-semana").textContent = `Semana ${semanaActual}`;
   cargarSemana();
 
   document.getElementById("btn-guardar").addEventListener("click", guardarPronosticos);
