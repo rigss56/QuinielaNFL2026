@@ -14,12 +14,13 @@ EQUIPOS_NFL.forEach((equipo) => {
 });
 
 // ---------- Marcador dinámico (bolsa estimada + cuenta regresiva) ----------
-// Nota: "usuarios" solo contiene participantes ya aprobados (con cuenta de
-// Auth creada). Las inscripciones en revisión viven en "solicitudes".
+// Lee de "stats/public", un contador que solo actualizan las Cloud Functions
+// al aprobar a alguien — así el público puede ver el número sin tener acceso
+// de lectura a la colección real de "usuarios" (que sí está protegida).
 async function actualizarMarcador() {
   try {
-    const snap = await db.collection("usuarios").get();
-    const aprobados = snap.size;
+    const snap = await db.collection("stats").doc("public").get();
+    const aprobados = snap.exists ? (snap.data().aprobados || 0) : 0;
     const bolsa = aprobados * COSTO_INSCRIPCION;
 
     document.getElementById("stat-inscritos").textContent = aprobados;
@@ -81,19 +82,6 @@ form.addEventListener("submit", async (e) => {
   submitBtn.textContent = "Enviando...";
 
   try {
-    // Evita registros duplicados por correo (ya inscrito o ya aprobado)
-    const [snapSolicitud, snapUsuario] = await Promise.all([
-      db.collection("solicitudes").where("correo", "==", correo).get(),
-      db.collection("usuarios").where("correo", "==", correo).get(),
-    ]);
-    if (!snapSolicitud.empty || !snapUsuario.empty) {
-      statusBox.className = "err";
-      statusBox.textContent = "Ese correo ya está registrado. Si no recibiste tu aprobación, contacta a un administrador.";
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Enviar inscripción";
-      return;
-    }
-
     await db.collection("solicitudes").add({
       nombre,
       equipoFavorito,
@@ -103,9 +91,10 @@ form.addEventListener("submit", async (e) => {
       fechaRegistro: firebase.firestore.FieldValue.serverTimestamp(),
     });
 
-    // La Cloud Function "onNuevaInscripcion" notifica por correo a los 3
-    // administradores. Al aprobar (con el link del correo), la función
-    // "aprobarInscripcion" crea la cuenta de Auth, mueve los datos a
+    // La Cloud Function "onNuevaInscripcion" revisa si el correo ya está
+    // registrado o aprobado y avisa a los administradores (incluyendo si es
+    // un posible duplicado). Al aprobar (con el link del correo), la función
+    // "resolverInscripcion" crea la cuenta de Auth, mueve los datos a
     // "usuarios/{uid}" y envía las credenciales temporales al participante.
 
     form.reset();
