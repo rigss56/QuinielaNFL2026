@@ -18,12 +18,12 @@
 // ============================================================
 
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_PROYECTO.firebaseapp.com",
-  projectId: "TU_PROYECTO",
-  storageBucket: "TU_PROYECTO.appspot.com",
-  messagingSenderId: "TU_SENDER_ID",
-  appId: "TU_APP_ID",
+  apiKey: "AIzaSyC0-MEes-Ulq_GoWNM_ZO9gd7aO1Oq-yWU",
+  authDomain: "quiniela-2026-5356e.firebaseapp.com",
+  projectId: "quiniela-2026-5356e",
+  storageBucket: "quiniela-2026-5356e.firebasestorage.app",
+  messagingSenderId: "758736766040",
+  appId: "1:758736766040:web:4f0e730926841b3033f62d",
 };
 
 // Lista de los 32 equipos de la NFL, usada en el formulario de registro
