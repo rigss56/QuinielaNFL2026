@@ -34,9 +34,11 @@
     <div class="block-head">
       <h2>Tabla General</h2>
     </div>
-    <div class="callout">
-      Esta pantalla se construye en la <strong>Fase 5</strong>: mostrará a todos los participantes ordenados por puntos acumulados semana tras semana.
+    <div id="sin-datos" class="callout" style="display:none;">
+      Todavía no hay puntos que mostrar — se van a ir acumulando conforme se
+      capturen resultados de partidos.
     </div>
+    <div id="tabla-container"></div>
   </div>
 </section>
 
@@ -50,20 +52,6 @@
 <script src="../js/firebase-config.js"></script>
 <script src="../js/auth-guard.js"></script>
 <script src="../js/nav.js"></script>
-<script>
-  requireAuth().then(({ datos }) => {
-    document.getElementById("nav-mount").appendChild(renderNav("tabla"));
-
-    const userBar = document.getElementById("user-bar");
-    const nombreSpan = document.createElement("span");
-    nombreSpan.textContent = `${datos.apodo} · `;
-    const salirLink = document.createElement("a");
-    salirLink.href = "#";
-    salirLink.textContent = "Cerrar sesión";
-    salirLink.addEventListener("click", (e) => { e.preventDefault(); cerrarSesion(); });
-    userBar.appendChild(nombreSpan);
-    userBar.appendChild(salirLink);
-  });
-</script>
+<script src="../js/tabla.js"></script>
 </body>
 </html>

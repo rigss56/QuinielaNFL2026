@@ -34,9 +34,41 @@
     <div class="block-head">
       <h2>Premios</h2>
     </div>
-    <div class="callout">
-      Esta pantalla se construye en la <strong>Fase 5</strong>: calculará en tiempo real la bolsa total, el premio semanal ya entregado y el estimado del premio final acumulado.
+
+    <div class="premio-stat-grid">
+      <div class="cell">
+        <div class="num" id="stat-bolsa">—</div>
+        <div class="label">Bolsa total</div>
+      </div>
+      <div class="cell">
+        <div class="num" id="stat-inscritos">—</div>
+        <div class="label">Inscritos aprobados</div>
+      </div>
+      <div class="cell">
+        <div class="num" id="stat-pagado">—</div>
+        <div class="label">Pagado en premios semanales</div>
+      </div>
+      <div class="cell">
+        <div class="num" id="stat-final">—</div>
+        <div class="label">Premio final estimado</div>
+      </div>
     </div>
+
+    <div class="callout">
+      $1,000 MXN al 1er lugar de cada semana. El remanente se acumula y se
+      entrega completo al 1er lugar general al cierre de la Semana 18. Si hay
+      empate en una semana, ese premio se retiene y se desempata con los
+      resultados de la semana siguiente, solo entre los empatados.
+    </div>
+
+    <div class="block-head" style="margin-top:36px;">
+      <h2 style="font-size:22px;">Premios semanales</h2>
+    </div>
+    <div id="sin-semanas" class="callout" style="display:none;">
+      Todavía no se ha resuelto ningún premio semanal — se van a ir
+      publicando aquí conforme termine cada semana.
+    </div>
+    <div id="semanas-container"></div>
   </div>
 </section>
 
@@ -50,20 +82,6 @@
 <script src="../js/firebase-config.js"></script>
 <script src="../js/auth-guard.js"></script>
 <script src="../js/nav.js"></script>
-<script>
-  requireAuth().then(({ datos }) => {
-    document.getElementById("nav-mount").appendChild(renderNav("premios"));
-
-    const userBar = document.getElementById("user-bar");
-    const nombreSpan = document.createElement("span");
-    nombreSpan.textContent = `${datos.apodo} · `;
-    const salirLink = document.createElement("a");
-    salirLink.href = "#";
-    salirLink.textContent = "Cerrar sesión";
-    salirLink.addEventListener("click", (e) => { e.preventDefault(); cerrarSesion(); });
-    userBar.appendChild(nombreSpan);
-    userBar.appendChild(salirLink);
-  });
-</script>
+<script src="../js/premios.js"></script>
 </body>
 </html>
