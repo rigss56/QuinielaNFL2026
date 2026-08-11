@@ -23,18 +23,97 @@
   <div class="wrap" style="display:flex;justify-content:flex-end;padding-bottom:0;">
     <span id="user-bar" style="font-size:13px;color:var(--cream-dim);"></span>
   </div>
+
   <div class="wrap">
     <div class="block-head">
       <span class="tag">Solo administradores</span>
       <h2>Panel de Administrador</h2>
     </div>
-    <div class="callout">
-      Este panel se construye en la <strong>Fase 6</strong>: aprobación/rechazo de
-      inscripciones, captura y edición de resultados semana a semana, ajuste manual
-      del calendario NFL, y gestión de usuarios. Por ahora, la aprobación/rechazo ya
-      funciona por correo (Fase 2) — este panel le va a agregar una vista de la lista
-      de solicitudes pendientes directamente en el sitio.
-      El acceso ya queda restringido a quien tenga <code>rol == "admin"</code> en Firestore.
+
+    <div class="admin-tabs">
+      <button data-tab="solicitudes" class="selected">Solicitudes</button>
+      <button data-tab="partidos">Cargar partidos</button>
+      <button data-tab="resultados">Capturar resultados</button>
+    </div>
+
+    <!-- ================= SOLICITUDES ================= -->
+    <div class="admin-panel-section selected" id="tab-solicitudes">
+      <div id="sin-solicitudes" class="callout" style="display:none;">
+        No hay solicitudes pendientes por revisar ahorita.
+      </div>
+      <div id="solicitudes-container"></div>
+    </div>
+
+    <!-- ================= CARGAR PARTIDOS ================= -->
+    <div class="admin-panel-section" id="tab-partidos">
+      <form class="ticket" id="form-partido" style="max-width:520px;">
+        <div class="field">
+          <label for="p-semana">Semana</label>
+          <select id="p-semana" required></select>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="p-local">Equipo Local</label>
+            <select id="p-local" required></select>
+          </div>
+          <div class="field">
+            <label for="p-visitante">Equipo Visitante</label>
+            <select id="p-visitante" required></select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="p-fecha">Fecha y hora del partido (tu hora local)</label>
+          <input type="datetime-local" id="p-fecha" required />
+        </div>
+        <button type="submit" class="btn-primary" id="btn-guardar-partido">Agregar partido</button>
+        <div id="partido-status" style="margin-top:14px;font-size:14px;color:var(--cream-dim);"></div>
+      </form>
+
+      <div class="block-head" style="margin-top:36px;">
+        <h2 style="font-size:20px;">Sincronizar con el calendario oficial</h2>
+      </div>
+      <div class="callout" style="margin-bottom:20px;">
+        Trae automático los partidos y horarios de esta semana desde ESPN.
+        Si un partido ya existe, solo le actualiza el horario (por si hubo
+        cambio de última hora) — nunca toca uno que ya tenga resultado
+        capturado. Esto también corre solo cada martes en la madrugada.
+      </div>
+      <div class="week-picker">
+        <label for="sync-semana" style="font-size:13px;color:var(--cream-dim);">Semana:</label>
+        <select id="sync-semana"></select>
+        <button class="btn-mini aprobar" id="btn-sincronizar" style="margin-left:10px;">Sincronizar con ESPN</button>
+      </div>
+      <div id="sync-status" style="font-size:14px;color:var(--cream-dim);margin-bottom:20px;"></div>
+
+      <div class="block-head" style="margin-top:36px;">
+        <h2 style="font-size:20px;">Partidos ya cargados</h2>
+      </div>
+      <div class="week-picker">
+        <label for="rev-semana" style="font-size:13px;color:var(--cream-dim);">Semana:</label>
+        <select id="rev-semana"></select>
+      </div>
+      <div id="partidos-cargados-container"></div>
+    </div>
+
+    <!-- ================= CAPTURAR RESULTADOS ================= -->
+    <div class="admin-panel-section" id="tab-resultados">
+      <div class="callout" style="margin-bottom:20px;">
+        Trae los marcadores finales desde ESPN y calcula L/E/V solo (7 puntos
+        de diferencia o más decide). Solo toca partidos que ya terminaron y
+        que todavía no tengan resultado — también corre sola varias veces al
+        día. Los botones de abajo siguen disponibles por si algún partido
+        necesita capturarse a mano.
+      </div>
+      <div class="week-picker">
+        <label for="res-semana" style="font-size:13px;color:var(--cream-dim);">Semana:</label>
+        <select id="res-semana"></select>
+        <button class="btn-mini aprobar" id="btn-descargar-resultados" style="margin-left:10px;">Descargar resultados</button>
+      </div>
+      <div id="resultados-sync-status" style="font-size:14px;color:var(--cream-dim);margin-bottom:20px;"></div>
+      <div id="sin-resultados" class="callout" style="display:none;">
+        No hay partidos cargados para esta semana.
+      </div>
+      <div id="resultados-container"></div>
     </div>
   </div>
 </section>
@@ -46,20 +125,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
 <script src="../js/firebase-config.js"></script>
 <script src="../js/auth-guard.js"></script>
-<script>
-  requireAdmin().then(({ datos }) => {
-    const userBar = document.getElementById("user-bar");
-    const nombreSpan = document.createElement("span");
-    nombreSpan.textContent = `${datos.apodo} (admin) · `;
-    const salirLink = document.createElement("a");
-    salirLink.href = "#";
-    salirLink.textContent = "Cerrar sesión";
-    salirLink.addEventListener("click", (e) => { e.preventDefault(); cerrarSesion(); });
-    userBar.appendChild(nombreSpan);
-    userBar.appendChild(salirLink);
-  });
-</script>
+<script src="../js/admin.js"></script>
 </body>
 </html>
