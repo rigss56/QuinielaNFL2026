@@ -628,6 +628,117 @@ section.block {
   margin-top: 10px;
 }
 
+/* ---------- Tabla General (ranking) ---------- */
+
+.ranking {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ranking th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cream-dim);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--navy-line);
+}
+
+.ranking td {
+  padding: 14px;
+  border-bottom: 1px solid var(--navy-line);
+  font-size: 14.5px;
+}
+
+.ranking tr:last-child td { border-bottom: none; }
+
+.ranking .pos {
+  font-family: var(--font-display);
+  font-size: 18px;
+  width: 40px;
+  color: var(--cream-dim);
+}
+
+.ranking tr.top1 .pos { color: var(--gold); }
+.ranking tr.top1 td { background: rgba(213, 10, 10, 0.06); }
+
+.ranking .apodo {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--cream);
+}
+
+.ranking .equipo {
+  color: var(--cream-dim);
+  font-size: 13px;
+}
+
+.ranking .puntos {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--gold-light);
+  text-align: right;
+}
+
+/* ---------- Premios (bolsa + historial semanal) ---------- */
+
+.premio-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  background: var(--navy-line);
+  border: 1px solid var(--navy-line);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.premio-stat-grid .cell {
+  background: var(--navy-card);
+  padding: 20px;
+}
+
+.premio-stat-grid .num {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  color: var(--gold-light);
+}
+
+.premio-stat-grid .label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--cream-dim);
+  margin-top: 4px;
+}
+
+.semana-premio-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--navy-card);
+  border: 1px solid var(--navy-line);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.semana-premio-row .ganador {
+  color: var(--cream);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.semana-premio-row .estado-empate {
+  color: var(--gold-light);
+  font-size: 12.5px;
+}
+
 .site-footer {
   border-top: 1px solid var(--navy-line);
   padding: 30px 0 50px;
