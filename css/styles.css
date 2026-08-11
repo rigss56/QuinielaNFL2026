@@ -748,6 +748,85 @@ section.block {
 
 .site-footer a { color: var(--cream-dim); }
 
+/* ---------- Panel de Admin ---------- */
+
+.admin-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.admin-tabs button {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 13px;
+  padding: 10px 18px;
+  border-radius: 7px;
+  border: 1px solid var(--navy-line);
+  background: transparent;
+  color: var(--cream-dim);
+  cursor: pointer;
+}
+
+.admin-tabs button.selected {
+  background: var(--gold);
+  color: var(--cream);
+  border-color: var(--gold);
+}
+
+.admin-panel-section { display: none; }
+.admin-panel-section.selected { display: block; }
+
+.solicitud-row {
+  background: var(--navy-card);
+  border: 1px solid var(--navy-line);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.solicitud-row .datos-solicitud { font-size: 14px; color: var(--cream-dim); }
+.solicitud-row .datos-solicitud strong { color: var(--cream); font-family: var(--font-display); }
+.solicitud-row .acciones { display: flex; gap: 8px; flex-shrink: 0; }
+
+.btn-mini {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  font-size: 12.5px;
+  letter-spacing: 0.03em;
+  padding: 9px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-mini.aprobar { background: var(--gold); color: var(--cream); }
+.btn-mini.rechazar { background: transparent; color: var(--cream-dim); border: 1px solid var(--navy-line); }
+.btn-mini:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.resultado-row {
+  background: var(--navy-card);
+  border: 1px solid var(--navy-line);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.resultado-row .vs { font-family: var(--font-display); text-transform: uppercase; font-size: 14px; }
+.resultado-row .fecha { font-family: var(--font-mono); font-size: 11px; color: var(--cream-dim); }
+
 /* focus visibility for accessibility */
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
   outline: 2px solid var(--gold);
