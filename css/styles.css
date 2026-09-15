@@ -683,6 +683,67 @@ section.block {
   text-align: right;
 }
 
+/* ---------- Matriz semanal completa ---------- */
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--navy-line);
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.matriz-semanal {
+  border-collapse: collapse;
+  white-space: nowrap;
+  min-width: 100%;
+}
+
+.matriz-semanal th,
+.matriz-semanal td {
+  padding: 10px 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--navy-line);
+  font-size: 13px;
+}
+
+.matriz-semanal thead th {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cream-dim);
+  background: var(--navy-card);
+  position: sticky;
+  top: 0;
+}
+
+.matriz-semanal .col-participante {
+  text-align: left;
+  position: sticky;
+  left: 0;
+  background: var(--navy-mid);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--cream);
+  z-index: 1;
+}
+
+.matriz-semanal thead .col-participante {
+  background: var(--navy-card);
+  z-index: 2;
+}
+
+.matriz-semanal .col-total {
+  font-family: var(--font-mono);
+  font-weight: bold;
+  color: var(--gold-light);
+  background: rgba(213, 10, 10, 0.08);
+}
+
+.matriz-semanal td.futura { color: var(--cream-dim); opacity: 0.4; }
+.matriz-semanal tr.fila-top1 .col-participante { color: var(--gold); }
+
 /* ---------- Premios (bolsa + historial semanal) ---------- */
 
 .premio-stat-grid {
