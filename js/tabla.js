@@ -29,8 +29,12 @@ async function cargarTabla(uidActual) {
   `;
   const tbody = tabla.querySelector("tbody");
 
+  const participantes = [];
+
   snap.docs.forEach((doc, i) => {
     const datos = doc.data();
+    participantes.push({ uid: doc.id, apodo: datos.apodo, puntosTotales: datos.puntosTotales || 0 });
+
     const tr = document.createElement("tr");
     if (i === 0) tr.className = "top1";
     if (doc.id === uidActual) tr.style.outline = "1px solid var(--gold)";
@@ -46,6 +50,41 @@ async function cargarTabla(uidActual) {
   });
 
   cont.appendChild(tabla);
+  cargarMatrizSemanal(participantes);
+}
+
+async function cargarMatrizSemanal(participantes) {
+  const tabla = document.getElementById("matriz-semanal");
+  const semanaActual = semanaActualPorFecha();
+
+  const puntosSnap = await db.collection("puntosSemana").get();
+  const puntosPorUidSemana = {}; // uid -> { semana: puntos }
+  puntosSnap.forEach((doc) => {
+    const d = doc.data();
+    if (!puntosPorUidSemana[d.usuarioId]) puntosPorUidSemana[d.usuarioId] = {};
+    puntosPorUidSemana[d.usuarioId][d.semana] = d.puntos;
+  });
+
+  let theadHtml = `<thead><tr><th class="col-participante">Participante</th>`;
+  for (let s = 1; s <= 18; s++) theadHtml += `<th>S${s}</th>`;
+  theadHtml += `<th class="col-total">Total</th></tr></thead>`;
+
+  let tbodyHtml = "<tbody>";
+  participantes.forEach((p, i) => {
+    tbodyHtml += `<tr class="${i === 0 ? "fila-top1" : ""}"><td class="col-participante">${p.apodo}</td>`;
+    for (let s = 1; s <= 18; s++) {
+      if (s > semanaActual) {
+        tbodyHtml += `<td class="futura">—</td>`;
+      } else {
+        const pts = (puntosPorUidSemana[p.uid] && puntosPorUidSemana[p.uid][s]) || 0;
+        tbodyHtml += `<td>${pts}</td>`;
+      }
+    }
+    tbodyHtml += `<td class="col-total">${p.puntosTotales}</td></tr>`;
+  });
+  tbodyHtml += "</tbody>";
+
+  tabla.innerHTML = theadHtml + tbodyHtml;
 }
 
 requireAuth().then(({ user, datos }) => {
