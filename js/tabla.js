@@ -101,4 +101,15 @@ requireAuth().then(({ user, datos }) => {
   userBar.appendChild(salirLink);
 
   cargarTabla(user.uid);
+
+  const btnActualizar = document.getElementById("btn-actualizar");
+  if (btnActualizar) {
+    btnActualizar.addEventListener("click", async () => {
+      btnActualizar.disabled = true;
+      btnActualizar.textContent = "Actualizando…";
+      await cargarTabla(user.uid);
+      btnActualizar.textContent = "Actualizar";
+      btnActualizar.disabled = false;
+    });
+  }
 });
