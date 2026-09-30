@@ -33,7 +33,13 @@ const RANGOS_SEMANA_TEMPORADA = {
  * terminó.
  */
 function semanaActualPorFecha(hoy = new Date()) {
-  const hoyStr = hoy.toISOString().slice(0, 10).replace(/-/g, "");
+  // Se usa la hora de la Ciudad de México (no UTC) recorrida 6 horas hacia
+  // atrás, para que la semana nueva empiece el MARTES a las 6:00 am, como
+  // marca el reglamento (antes cambiaba el lunes a las 6 pm por usar UTC).
+  const referencia = new Date(hoy.getTime() - 6 * 60 * 60 * 1000);
+  const hoyStr = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Mexico_City", year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(referencia).replace(/-/g, "");
   const entradas = Object.entries(RANGOS_SEMANA_TEMPORADA);
 
   for (const [semana, [inicio, fin]] of entradas) {
