@@ -227,7 +227,7 @@ exports.panelSincronizarResultados = onCall(
 // 7. Descargar resultados de ESPN — automático, todos los días
 // ============================================================
 exports.sincronizarResultadosDiario = onSchedule(
-  { region: FUNCTIONS_REGION, schedule: "0 6,12,20,23 * * *", timeZone: "America/Mexico_City" },
+  { region: FUNCTIONS_REGION, schedule: "0 0,6,12,20,23 * * *", timeZone: "America/Mexico_City" },
   async () => {
     const semanas = semanasARevisar(new Date());
     for (const semana of semanas) {
