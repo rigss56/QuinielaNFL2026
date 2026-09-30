@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quiniela NFL 2026 — Reglamento</title>
+<link rel="icon" href="../img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <img src="../img/logo.png" alt="Logo Quiniela NFL 2026" />
+    <div class="wordmark">Quiniela <span>NFL 2026</span></div>
+  </div>
+</header>
+
+<section class="block" style="border-top:none;padding-bottom:0;">
+  <div class="wrap" id="nav-mount"></div>
+</section>
+
+<section class="block" style="border-top:none;padding-top:0;padding-bottom:20px;">
+  <div class="wrap" style="display:flex;justify-content:flex-end;">
+    <span id="user-bar" style="font-size:13px;color:var(--cream-dim);"></span>
+  </div>
+</section>
+
+<section class="block" style="border-top:none;">
+  <div class="wrap">
+    <div class="block-head">
+      <h2>Reglamento</h2>
+    </div>
+    <p style="font-size:13px;color:var(--cream-dim);margin-top:-14px;">
+      Todas las horas son del centro de México (CDMX).
+    </p>
+
+    <div class="rule-grid">
+      <div>
+        <h3>Cada semana</h3>
+        <ul>
+          <li><strong>Martes 5:00 am:</strong> se cargan solos los partidos de la semana desde ESPN.</li>
+          <li><strong>Martes 6:00 am:</strong> se abre la quiniela de la semana.</li>
+          <li><strong>Cierre:</strong> 5 minutos antes del <strong>primer partido de la semana</strong>, sea el día que sea (normalmente jueves). Desde ese momento ya no se puede capturar ni cambiar ningún pick de la semana.</li>
+          <li><strong>Al cierre</strong> se publica el <strong>Pronóstico Semanal</strong> con los picks de todos, incluidos los autollenados.</li>
+          <li>Antes del cierre nadie puede ver los picks de los demás.</li>
+        </ul>
+
+        <h3 style="margin-top:24px">Cómo se juega</h3>
+        <ul>
+          <li><strong>L</strong>: gana el local por 7 puntos o más.</li>
+          <li><strong>E</strong>: la diferencia es menor a 7 puntos.</li>
+          <li><strong>V</strong>: gana el visitante por 7 puntos o más.</li>
+          <li>1 punto por cada acierto.</li>
+          <li>Solo temporada regular: Semanas 1 a 18.</li>
+        </ul>
+
+        <h3 style="margin-top:24px">Si no llenas a tiempo</h3>
+        <ul>
+          <li>Se aplica <strong>por partido</strong>: todo partido que no llenaste se marca como <strong>V</strong>.</li>
+          <li>Excepto el partido de tu equipo favorito, que se marca con la opción que lo hace ganar.</li>
+          <li>En el Pronóstico Semanal los picks autollenados aparecen con asterisco (*).</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3>Resultados y puntos</h3>
+        <ul>
+          <li>Los resultados se descargan de ESPN <strong>5 veces al día: 12:00 am, 6:00 am, 12:00 pm, 8:00 pm y 11:00 pm</strong>.</li>
+          <li>Los puntos se calculan en cuanto entra cada resultado.</li>
+          <li>La semana se cierra y se define el ganador cuando ya están todos sus resultados (normalmente el martes temprano, después del Monday Night).</li>
+          <li>La Tabla General y el Pronóstico Semanal se actualizan al abrirlos o con el botón "Actualizar".</li>
+        </ul>
+
+        <h3 style="margin-top:24px">Premios</h3>
+        <ul>
+          <li>Cuota: $1,750 MXN por participante.</li>
+          <li>Bolsa total = participantes aprobados × $1,750 MXN.</li>
+          <li>$1,000 MXN al 1er lugar de cada una de las 18 semanas.</li>
+          <li>El remanente se entrega completo al 1er lugar general al cierre de la Semana 18.</li>
+        </ul>
+
+        <h3 style="margin-top:24px">Desempates semanales</h3>
+        <ul>
+          <li>Si hay empate en una semana, ese premio se retiene.</li>
+          <li>Se desempata comparando solo a los empatados en las semanas siguientes, hasta que uno saque ventaja.</li>
+        </ul>
+
+        <h3 style="margin-top:24px">Cambio de horario</h3>
+        <ul>
+          <li>A partir del <strong>1 de noviembre</strong> (EE.UU. cambia de horario y México no), los partidos se ven <strong>1 hora más tarde</strong> en CDMX.</li>
+          <li>El cierre se recorre solo junto con el primer partido. La apertura del martes a las 6:00 am no cambia.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">Quiniela NFL 2026</div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth-guard.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+  requireAuth().then(({ datos }) => {
+    document.getElementById("nav-mount").appendChild(renderNav("reglamento"));
+    const userBar = document.getElementById("user-bar");
+    const nombreSpan = document.createElement("span");
+    nombreSpan.textContent = `${datos.apodo} · `;
+    const salirLink = document.createElement("a");
+    salirLink.href = "#";
+    salirLink.textContent = "Cerrar sesión";
+    salirLink.addEventListener("click", (e) => { e.preventDefault(); cerrarSesion(); });
+    userBar.appendChild(nombreSpan);
+    userBar.appendChild(salirLink);
+  });
+</script>
+</body>
+</html>
