@@ -22,24 +22,27 @@ service cloud.firestore {
       return estaAutenticado() && request.auth.uid == uid;
     }
 
-    // -------- solicitudes (inscripciones en revisión) --------
+    function aunAbierto(partidoId) {
+      let partido = get(/databases/$(database)/documents/partidos/$(partidoId)).data;
+      // Además: en cuanto se publica el Pronóstico Semanal de esa semana
+      // (al cierre), ya no se puede capturar ni cambiar ningún pick de la semana.
+      return request.time < (partido.fechaHora - duration.value(5, 'm'))
+        && !exists(/databases/$(database)/documents/pronosticoSemanal/$('semana_' + string(partido.semana)));
+    }
+
+    match /stats/public {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /solicitudes/{id} {
-      // El formulario público crea la solicitud; nadie más puede escribir
-      // desde el cliente. Las Cloud Functions (Admin SDK) sí pueden,
-      // porque el Admin SDK no pasa por estas reglas.
       allow create: if request.resource.data.estado == "pendiente";
       allow read: if esAdmin();
       allow update, delete: if esAdmin();
     }
 
-    // -------- usuarios (participantes ya aprobados, uid = Firebase Auth uid) --------
     match /usuarios/{uid} {
-      // Los documentos solo los crea la Cloud Function "aprobarInscripcion"
-      // (Admin SDK), nunca el cliente directamente.
       allow create: if false;
-
-      // Un participante puede leer/editar su propio documento (ej. su apodo),
-      // pero nunca su rol o puntosTotales. Los admins pueden todo.
       allow read: if esDueno(uid) || esAdmin();
       allow update: if esAdmin() ||
                     (esDueno(uid)
@@ -48,19 +51,44 @@ service cloud.firestore {
       allow delete: if esAdmin();
     }
 
-    // -------- partidos (calendario + resultados) --------
     match /partidos/{partidoId} {
       allow read: if estaAutenticado();
       allow write: if esAdmin();
     }
 
-    // -------- pronosticos --------
+    match /tabla/{uid} {
+      allow read: if estaAutenticado();
+      allow write: if false;
+    }
+
+    match /resultadosSemana/{semana} {
+      allow read: if estaAutenticado();
+      allow write: if false;
+    }
+
+    match /puntosSemana/{id} {
+      allow read: if estaAutenticado();
+      allow write: if false;
+    }
+
+    // Vaciado público de picks de la semana; lo escribe solo la Cloud Function
+    // publicarPronosticoSemanal (Admin SDK) al cierre de cada semana.
+    match /pronosticoSemanal/{semanaId} {
+      allow read: if estaAutenticado();
+      allow write: if false;
+    }
+
     match /pronosticos/{pronosticoId} {
-      allow read: if esAdmin() || (estaAutenticado() && resource.data.usuarioId == request.auth.uid);
-      allow create: if estaAutenticado() && request.resource.data.usuarioId == request.auth.uid;
-      // Los participantes solo pueden crear/editar los suyos; el cierre por horario
-      // se refuerza además desde Cloud Functions (Fase 4).
-      allow update: if esAdmin() || (estaAutenticado() && resource.data.usuarioId == request.auth.uid);
+      allow read: if esAdmin()
+                  || (estaAutenticado()
+                      && (resource == null || resource.data.usuarioId == request.auth.uid));
+      allow create: if estaAutenticado()
+                    && request.resource.data.usuarioId == request.auth.uid
+                    && aunAbierto(request.resource.data.partidoId);
+      allow update: if esAdmin()
+                    || (estaAutenticado()
+                        && resource.data.usuarioId == request.auth.uid
+                        && aunAbierto(resource.data.partidoId));
       allow delete: if esAdmin();
     }
   }

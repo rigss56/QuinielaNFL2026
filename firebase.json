@@ -6,7 +6,22 @@
     {
       "source": "functions",
       "codebase": "default",
-      "ignore": ["node_modules", ".git", ".env", "*.log"]
+      "ignore": [
+        "node_modules",
+        ".git",
+        ".env",
+        "*.log"
+      ]
+    },
+    {
+      "source": "functions-pronostico",
+      "codebase": "pronostico",
+      "ignore": [
+        "node_modules",
+        ".git",
+        ".env",
+        "*.log"
+      ]
     }
   ]
 }
