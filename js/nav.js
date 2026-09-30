@@ -2,6 +2,7 @@ function renderNav(activo) {
   const items = [
     { id: "quiniela", label: "Quiniela", href: "quiniela.html" },
     { id: "tabla", label: "Tabla General", href: "tabla.html" },
+    { id: "pronostico", label: "Pronóstico Semanal", href: "pronostico-semanal.html" },
     { id: "premios", label: "Premios", href: "premios.html" },
   ];
 
