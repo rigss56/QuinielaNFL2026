@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quiniela NFL 2026 — Pronóstico Semanal</title>
+<link rel="icon" href="../img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/styles.css" />
+<style>
+/* ---------- Pronóstico Semanal (vaciado de picks) ---------- */
+
+.matriz-pronostico th,
+.matriz-pronostico td { padding: 8px 6px; }
+.matriz-pronostico thead th { line-height: 1.15; }
+.matriz-pronostico .ps-eq { font-weight: bold; color: var(--cream); }
+.matriz-pronostico .ps-at { opacity: 0.5; font-size: 10px; }
+
+.ps-pick {
+  display: inline-block;
+  min-width: 26px;
+  padding: 3px 4px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  font-size: 12px;
+  border: 1px solid var(--navy-line);
+  color: var(--cream);
+}
+.ps-pick.ps-ok { background: #1f7a3d; border-color: #2ea65a; }
+.ps-pick.ps-fallo { background: rgba(213, 10, 10, 0.35); border-color: rgba(255, 77, 77, 0.5); color: #ffd6d6; }
+.ps-pick.ps-auto { font-style: italic; border-style: dashed; opacity: 0.85; }
+.ps-pick.ps-real { background: var(--cream); color: var(--navy-deep); border-color: var(--cream); }
+.ps-pendiente { color: var(--cream-dim); opacity: 0.5; }
+
+.ps-fila-resultado td { background: rgba(255, 255, 255, 0.05); }
+.ps-fila-resultado .col-participante { color: var(--cream-dim); }
+.matriz-pronostico tr.ps-yo td { background: rgba(213, 10, 10, 0.10); }
+.matriz-pronostico tr.ps-yo .col-participante { color: var(--gold-light); }
+
+.ps-tag-auto {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 1px 4px;
+  margin-left: 4px;
+  border-radius: 3px;
+  border: 1px dashed var(--cream-dim);
+  color: var(--cream-dim);
+  vertical-align: middle;
+}
+
+.ps-leyenda { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--cream-dim); align-items: center; }
+.ps-leyenda .ps-pick { margin-right: 4px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <img src="../img/logo.png" alt="Logo Quiniela NFL 2026" />
+    <div class="wordmark">Quiniela <span>NFL 2026</span></div>
+  </div>
+</header>
+
+<section class="block" style="border-top:none;padding-bottom:0;">
+  <div class="wrap" id="nav-mount"></div>
+</section>
+
+<section class="block" style="border-top:none;padding-top:0;padding-bottom:20px;">
+  <div class="wrap" style="display:flex;justify-content:flex-end;">
+    <span id="user-bar" style="font-size:13px;color:var(--cream-dim);"></span>
+  </div>
+</section>
+
+<section class="block" style="border-top:none;">
+  <div class="wrap">
+    <div class="block-head">
+      <h2>Pronóstico Semanal</h2>
+    </div>
+    <p id="ps-subtitulo" style="font-size:13px;color:var(--cream-dim);margin-top:-14px;"></p>
+
+    <div id="ps-vacio" class="callout" style="display:none;"></div>
+
+    <div id="ps-contenido" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+        <div class="ps-leyenda">
+          <span><span class="ps-pick ps-ok">L</span> Acierto</span>
+          <span><span class="ps-pick ps-fallo">L</span> Fallo</span>
+          <span><span class="ps-pick">L</span> Pendiente</span>
+          <span><span class="ps-pick ps-auto">V*</span> Autollenado (no llenó a tiempo)</span>
+        </div>
+        <button id="btn-actualizar" type="button" class="btn-secundario">Actualizar</button>
+      </div>
+      <div class="table-scroll">
+        <table class="matriz-semanal matriz-pronostico" id="ps-tabla"></table>
+      </div>
+      <p style="font-size:12px;color:var(--cream-dim);margin-top:10px;">
+        L = gana el local por 7 o más · E = diferencia menor a 7 · V = gana el visitante por 7 o más.
+        Desliza a los lados para ver todos los partidos.
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">Quiniela NFL 2026</div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth-guard.js"></script>
+<script src="../js/nav.js"></script>
+<script src="../js/calendario-temporada.js"></script>
+<script src="../js/pronostico-semanal.js"></script>
+</body>
+</html>
