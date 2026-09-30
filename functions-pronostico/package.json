@@ -1,0 +1,12 @@
+{
+  "name": "quiniela-nfl-2026-pronostico-semanal",
+  "description": "Publica el Pronóstico Semanal (vaciado de picks de todos) al cierre de cada semana.",
+  "engines": { "node": "22" },
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "firebase-admin": "^12.1.0",
+    "firebase-functions": "^5.0.0"
+  },
+  "private": true
+}
