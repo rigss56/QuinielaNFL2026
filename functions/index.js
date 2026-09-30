@@ -1,5 +1,6 @@
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
-const { onRequest } = require("firebase-functions/v2/https");
+const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const { onRequest, onCall, HttpsError } = require("firebase-functions/v2/https");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 
@@ -11,11 +12,14 @@ const {
   enviarCorreo,
   APP_BASE_URL,
 } = require("./lib/email");
+const { calcularPuntosDePartido, procesarSemanaSiCompleta } = require("./lib/scoring");
+const { procesarSolicitud } = require("./lib/aprobacion");
+const { sincronizarSemana, sincronizarResultados, semanasARevisar } = require("./lib/calendario");
 
 admin.initializeApp();
 const db = admin.firestore();
 
-const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
+const GMAIL_APP_PASSWORD = defineSecret("GMAIL_APP_PASSWORD");
 const APPROVAL_SECRET = defineSecret("APPROVAL_SECRET");
 
 const CORREOS_ADMIN = [
@@ -26,15 +30,26 @@ const CORREOS_ADMIN = [
 
 const FUNCTIONS_REGION = "us-central1";
 
+const ctxAprobacion = {
+  db, admin, enviarCorreo, correoCredenciales, correoRechazo,
+  APP_BASE_URL, generarPasswordTemporal,
+};
+
 // ============================================================
 // 1. Nueva inscripción en /solicitudes → avisa a los 3 admins
 // ============================================================
 exports.onNuevaInscripcion = onDocumentCreated(
-  { document: "solicitudes/{solicitudId}", region: FUNCTIONS_REGION, secrets: [SENDGRID_API_KEY, APPROVAL_SECRET] },
+  { document: "solicitudes/{solicitudId}", region: FUNCTIONS_REGION, secrets: [GMAIL_APP_PASSWORD, APPROVAL_SECRET] },
   async (event) => {
     const solicitudId = event.params.solicitudId;
     const datos = event.data.data();
     const secret = APPROVAL_SECRET.value();
+
+    const [yaAprobado, otrasSolicitudes] = await Promise.all([
+      db.collection("usuarios").where("correo", "==", datos.correo).limit(1).get(),
+      db.collection("solicitudes").where("correo", "==", datos.correo).get(),
+    ]);
+    const esDuplicado = !yaAprobado.empty || otrasSolicitudes.size > 1;
 
     const tokenAprobar = firmar(solicitudId, "aprobar", secret);
     const tokenRechazar = firmar(solicitudId, "rechazar", secret);
@@ -50,21 +65,22 @@ exports.onNuevaInscripcion = onDocumentCreated(
       equipoFavorito: datos.equipoFavorito,
       linkAprobar,
       linkRechazar,
+      esDuplicado,
     });
 
     await enviarCorreo({
       to: CORREOS_ADMIN,
-      subject: `Nueva inscripción: ${datos.nombre} (${datos.apodo})`,
+      subject: `${esDuplicado ? "[Posible duplicado] " : ""}Nueva inscripción: ${datos.nombre} (${datos.apodo})`,
       html,
     });
   }
 );
 
 // ============================================================
-// 2. Resolver inscripción (aprobar o rechazar) — link del correo
+// 2. Resolver inscripción desde el LINK DEL CORREO (token firmado)
 // ============================================================
 exports.resolverInscripcion = onRequest(
-  { region: FUNCTIONS_REGION, secrets: [SENDGRID_API_KEY, APPROVAL_SECRET] },
+  { region: FUNCTIONS_REGION, secrets: [GMAIL_APP_PASSWORD, APPROVAL_SECRET] },
   async (req, res) => {
     const { id, accion, token } = req.query;
     const secret = APPROVAL_SECRET.value();
@@ -76,70 +92,49 @@ exports.resolverInscripcion = onRequest(
       return res.status(403).send(paginaResultado("Este link no es válido o ya expiró.", false));
     }
 
-    const ref = db.collection("solicitudes").doc(id);
-    const snap = await ref.get();
-    if (!snap.exists) {
-      return res.status(404).send(paginaResultado("Esta solicitud ya no existe.", false));
-    }
-    const datos = snap.data();
+    const resultado = await procesarSolicitud(ctxAprobacion, id, accion);
+    return res.status(resultado.ok ? 200 : 409).send(paginaResultado(resultado.mensaje, resultado.ok));
+  }
+);
 
-    if (datos.estado !== "pendiente") {
-      return res.status(200).send(paginaResultado(`Esta solicitud ya fue procesada (estado: ${datos.estado}).`, true));
+// ============================================================
+// 2b. Resolver inscripción desde el PANEL DE ADMIN (sesión autenticada)
+// ============================================================
+exports.panelResolverSolicitud = onCall(
+  { region: FUNCTIONS_REGION, secrets: [GMAIL_APP_PASSWORD, APPROVAL_SECRET] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Debes iniciar sesión.");
     }
-
-    if (accion === "rechazar") {
-      await ref.update({ estado: "rechazado", fechaResolucion: admin.firestore.FieldValue.serverTimestamp() });
-      await enviarCorreo({
-        to: datos.correo,
-        subject: "Tu inscripción a la Quiniela NFL 2026",
-        html: correoRechazo({ nombre: datos.nombre }),
-      });
-      return res.status(200).send(paginaResultado(`Inscripción de ${datos.nombre} rechazada.`, true));
+    const adminSnap = await db.collection("usuarios").doc(request.auth.uid).get();
+    if (!adminSnap.exists || adminSnap.data().rol !== "admin") {
+      throw new HttpsError("permission-denied", "Solo administradores pueden hacer esto.");
     }
 
-    // accion === "aprobar"
-    const passwordTemporal = generarPasswordTemporal();
-
-    let userRecord;
-    try {
-      userRecord = await admin.auth().createUser({
-        email: datos.correo,
-        password: passwordTemporal,
-        displayName: datos.nombre,
-      });
-    } catch (err) {
-      if (err.code === "auth/email-already-exists") {
-        return res.status(409).send(paginaResultado("Ya existe una cuenta con ese correo.", false));
-      }
-      console.error(err);
-      return res.status(500).send(paginaResultado("Ocurrió un error al crear la cuenta. Intenta de nuevo.", false));
+    const { solicitudId, accion } = request.data;
+    if (!solicitudId || !["aprobar", "rechazar"].includes(accion)) {
+      throw new HttpsError("invalid-argument", "Solicitud inválida.");
     }
 
-    await db.collection("usuarios").doc(userRecord.uid).set({
-      nombre: datos.nombre,
-      equipoFavorito: datos.equipoFavorito,
-      correo: datos.correo,
-      apodo: datos.apodo,
-      rol: "participante",
-      puntosTotales: 0,
-      passwordTemporal: true,
-      fechaAprobacion: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    return procesarSolicitud(ctxAprobacion, solicitudId, accion);
+  }
+);
 
-    await ref.update({ estado: "aprobado", fechaResolucion: admin.firestore.FieldValue.serverTimestamp() });
+// ============================================================
+// 3. Calcular puntos al capturar el resultado de un partido
+// ============================================================
+exports.calcularPuntos = onDocumentUpdated(
+  { document: "partidos/{partidoId}", region: FUNCTIONS_REGION },
+  async (event) => {
+    const antes = event.data.before.data();
+    const despues = event.data.after.data();
 
-    await enviarCorreo({
-      to: datos.correo,
-      subject: "¡Ya estás dentro! Tus accesos a la Quiniela NFL 2026",
-      html: correoCredenciales({
-        nombre: datos.nombre,
-        correo: datos.correo,
-        passwordTemporal,
-        linkLogin: `${APP_BASE_URL}/login.html`,
-      }),
-    });
+    // Solo actuar cuando resultadoFinal pasa de vacío a capturado
+    if (antes.resultadoFinal || !despues.resultadoFinal) return;
 
-    return res.status(200).send(paginaResultado(`${datos.nombre} fue aprobado y ya recibió sus credenciales.`, true));
+    const partidoId = event.params.partidoId;
+    await calcularPuntosDePartido(db, admin, partidoId, despues);
+    await procesarSemanaSiCompleta(db, admin, despues.semana);
   }
 );
 
@@ -153,3 +148,95 @@ function paginaResultado(mensaje, ok) {
   </div>
 </body></html>`;
 }
+
+// ============================================================
+// 4. Sincronizar calendario con ESPN — botón manual del panel
+// ============================================================
+exports.panelSincronizarCalendario = onCall(
+  { region: FUNCTIONS_REGION },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Debes iniciar sesión.");
+    }
+    const adminSnap = await db.collection("usuarios").doc(request.auth.uid).get();
+    if (!adminSnap.exists || adminSnap.data().rol !== "admin") {
+      throw new HttpsError("permission-denied", "Solo administradores pueden hacer esto.");
+    }
+
+    const { semana } = request.data;
+    if (!semana || semana < 1 || semana > 18) {
+      throw new HttpsError("invalid-argument", "Semana inválida.");
+    }
+
+    try {
+      return await sincronizarSemana(db, admin, semana);
+    } catch (err) {
+      console.error(err);
+      throw new HttpsError("internal", "No se pudo sincronizar con ESPN. Intenta de nuevo en un rato.");
+    }
+  }
+);
+
+// ============================================================
+// 5. Sincronizar calendario con ESPN — automático, cada martes
+// ============================================================
+exports.sincronizarCalendarioSemanal = onSchedule(
+  { region: FUNCTIONS_REGION, schedule: "0 5 * * 2", timeZone: "America/Mexico_City" },
+  async () => {
+    const semanas = semanasARevisar(new Date());
+    for (const semana of semanas) {
+      try {
+        const resultado = await sincronizarSemana(db, admin, semana);
+        console.log(`Semana ${semana} sincronizada:`, resultado);
+      } catch (err) {
+        console.error(`Error sincronizando semana ${semana}:`, err);
+      }
+    }
+  }
+);
+
+// ============================================================
+// 6. Descargar resultados de ESPN — botón manual del panel
+// ============================================================
+exports.panelSincronizarResultados = onCall(
+  { region: FUNCTIONS_REGION },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Debes iniciar sesión.");
+    }
+    const adminSnap = await db.collection("usuarios").doc(request.auth.uid).get();
+    if (!adminSnap.exists || adminSnap.data().rol !== "admin") {
+      throw new HttpsError("permission-denied", "Solo administradores pueden hacer esto.");
+    }
+
+    const { semana } = request.data;
+    if (!semana || semana < 1 || semana > 18) {
+      throw new HttpsError("invalid-argument", "Semana inválida.");
+    }
+
+    try {
+      return await sincronizarResultados(db, admin, semana);
+    } catch (err) {
+      console.error(err);
+      throw new HttpsError("internal", "No se pudo consultar ESPN. Intenta de nuevo en un rato.");
+    }
+  }
+);
+
+// ============================================================
+// 7. Descargar resultados de ESPN — automático, todos los días
+// ============================================================
+exports.sincronizarResultadosDiario = onSchedule(
+  { region: FUNCTIONS_REGION, schedule: "0 6,12,20,23 * * *", timeZone: "America/Mexico_City" },
+  async () => {
+    const semanas = semanasARevisar(new Date());
+    for (const semana of semanas) {
+      try {
+        const resultado = await sincronizarResultados(db, admin, semana);
+        console.log(`Resultados semana ${semana}:`, resultado);
+      } catch (err) {
+        console.error(`Error descargando resultados semana ${semana}:`, err);
+      }
+    }
+  }
+);

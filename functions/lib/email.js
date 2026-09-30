@@ -1,11 +1,18 @@
-const sgMail = require("@sendgrid/mail");
+const nodemailer = require("nodemailer");
 
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-const FROM_EMAIL = process.env.FROM_EMAIL || "quiniela@example.com";
+const GMAIL_USER = process.env.GMAIL_USER;
+const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
 const APP_BASE_URL = process.env.APP_BASE_URL || "https://TU-USUARIO.github.io/TU-REPO";
 
-if (SENDGRID_API_KEY) {
-  sgMail.setApiKey(SENDGRID_API_KEY);
+let transporter = null;
+function getTransporter() {
+  if (!transporter && GMAIL_USER && GMAIL_APP_PASSWORD) {
+    transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
+    });
+  }
+  return transporter;
 }
 
 const AZUL = "#013369";
@@ -52,8 +59,14 @@ function botón(texto, href, color) {
 }
 
 // ---------- 1. Aviso a los administradores de nueva inscripción ----------
-function correoNuevaInscripcion({ nombre, apodo, correo, equipoFavorito, linkAprobar, linkRechazar }) {
+function correoNuevaInscripcion({ nombre, apodo, correo, equipoFavorito, linkAprobar, linkRechazar, esDuplicado }) {
+  const avisoDuplicado = esDuplicado
+    ? `<div style="background:${ROJO};color:#fff;padding:10px 14px;border-radius:6px;margin-bottom:16px;font-size:13px;font-weight:bold;">
+         ⚠️ Ya existe otra solicitud o cuenta aprobada con este correo — revisa antes de aprobar.
+       </div>`
+    : "";
   const cuerpo = `
+    ${avisoDuplicado}
     <p style="margin:0 0 16px;">Nueva inscripción pendiente de revisión:</p>
     <table role="presentation" width="100%" cellpadding="6" cellspacing="0" style="background:#0e315c;border-radius:8px;margin-bottom:22px;">
       <tr><td style="color:#93a4bd;">Nombre</td><td style="color:#fff;font-weight:bold;">${nombre}</td></tr>
@@ -94,11 +107,12 @@ function correoRechazo({ nombre }) {
 }
 
 async function enviarCorreo({ to, subject, html }) {
-  if (!SENDGRID_API_KEY) {
-    console.warn(`[email] SENDGRID_API_KEY no configurado — se omite el envío a ${to}: "${subject}"`);
+  const t = getTransporter();
+  if (!t) {
+    console.warn(`[email] GMAIL_USER/GMAIL_APP_PASSWORD no configurados — se omite el envío a ${to}: "${subject}"`);
     return;
   }
-  await sgMail.send({ to, from: FROM_EMAIL, subject, html });
+  await t.sendMail({ from: `Quiniela NFL 2026 <${GMAIL_USER}>`, to, subject, html });
 }
 
 module.exports = {
