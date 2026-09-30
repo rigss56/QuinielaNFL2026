@@ -4,6 +4,7 @@ function renderNav(activo) {
     { id: "tabla", label: "Tabla General", href: "tabla.html" },
     { id: "pronostico", label: "Pronóstico Semanal", href: "pronostico-semanal.html" },
     { id: "premios", label: "Premios", href: "premios.html" },
+    { id: "reglamento", label: "Reglamento", href: "reglamento.html" },
   ];
 
   const nav = document.createElement("nav");
